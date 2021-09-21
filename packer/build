@@ -1,0 +1,1 @@
+packer build -var-file=worker.pkrvars.hcl worker.pkr.hcl
