@@ -1,0 +1,14 @@
+# OCI Tenancy
+tenancy_ocid     = ""
+user_ocid        = ""
+fingerprint      = ""
+private_key_path = ""
+region           = ""
+compartment_ocid = ""
+
+# OCI Image Repository Credentials
+ocir_user_name   = ""
+ocir_password    = ""
+
+# Job Notifications
+email_address    = ""

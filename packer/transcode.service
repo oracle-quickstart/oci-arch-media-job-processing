@@ -1,0 +1,10 @@
+[Unit]
+Description=Transcode demo service.
+After=ocid.service
+
+[Service]
+Type=oneshot
+ExecStart=/home/opc/transcode.sh
+
+[Install]
+WantedBy=multi-user.target

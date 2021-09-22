@@ -1,54 +1,99 @@
-resource "oci_core_vcn" "simple" {
-  count          = local.use_existing_network ? 0 : 1
-  cidr_block     = var.vcn_cidr_block
-  dns_label      = substr(var.vcn_dns_label, 0, 15)
-  compartment_id = var.network_compartment_ocid
-  display_name   = var.vcn_display_name
-
-  freeform_tags = map(var.tag_key_name, var.tag_value)
+resource "oci_core_vcn" "vcn" {
+  cidr_block     = var.vcn_cidr
+  dns_label      = "jobs"
+  compartment_id = var.compartment_ocid
+  display_name   = "vcn"
 }
 
-#IGW
-resource "oci_core_internet_gateway" "simple_internet_gateway" {
-  count          = local.use_existing_network ? 0 : 1
-  compartment_id = var.network_compartment_ocid
-  vcn_id         = oci_core_vcn.simple[count.index].id
-  enabled        = "true"
-  display_name   = "${var.vcn_display_name}-igw"
+resource "oci_core_security_list" "public_security_list" {
+  compartment_id = var.compartment_ocid
+  vcn_id         = oci_core_vcn.vcn.id
+  display_name   = "public_subnets"
+  egress_security_rules {
+    destination = "0.0.0.0/0"
+    protocol    = "6"
+  }
+  ingress_security_rules {
+    protocol  = "6" // tcp
+    source    = "0.0.0.0/0"
+    stateless = false
 
-  freeform_tags = map(var.tag_key_name, var.tag_value)
+    tcp_options {
+      min = 443
+      max = 443
+    }
+  }
 }
 
-#simple subnet
-resource "oci_core_subnet" "simple_subnet" {
-  count                      = local.use_existing_network ? 0 : 1
-  cidr_block                 = var.subnet_cidr_block
-  compartment_id             = var.network_compartment_ocid
-  vcn_id                     = oci_core_vcn.simple[count.index].id
-  display_name               = var.subnet_display_name
-  dns_label                  = substr(var.subnet_dns_label, 0, 15)
-  prohibit_public_ip_on_vnic = ! local.is_public_subnet
-
-  freeform_tags = map(var.tag_key_name, var.tag_value)
+resource "oci_core_security_list" "private_security_list" {
+  compartment_id = var.compartment_ocid
+  vcn_id         = oci_core_vcn.vcn.id
+  display_name   = "private_subnets"
+  egress_security_rules {
+    destination = "0.0.0.0/0"
+    protocol    = "6"
+  }
 }
 
-resource "oci_core_route_table" "simple_route_table" {
-  count          = local.use_existing_network ? 0 : 1
-  compartment_id = var.network_compartment_ocid
-  vcn_id         = oci_core_vcn.simple[count.index].id
-  display_name   = "${var.subnet_display_name}-rt"
+resource "oci_core_subnet" "public_subnet" {
+  cidr_block        = var.public_subnet_cidr
+  display_name      = "public_subnet"
+  dns_label         = "public"
+  compartment_id    = var.compartment_ocid
+  vcn_id            = oci_core_vcn.vcn.id
+  security_list_ids = [oci_core_security_list.public_security_list.id]
+  route_table_id    = oci_core_route_table.public_subnets.id
+  dhcp_options_id   = oci_core_vcn.vcn.default_dhcp_options_id
+}
+
+
+resource "oci_core_subnet" "private_subnet" {
+  cidr_block                 = var.private_subnet_cidr
+  display_name               = "private_subnet"
+  dns_label                  = "private"
+  compartment_id             = var.compartment_ocid
+  vcn_id                     = oci_core_vcn.vcn.id
+  prohibit_public_ip_on_vnic = "true"
+  security_list_ids          = [oci_core_security_list.private_security_list.id]
+  route_table_id             = oci_core_route_table.private_subnets.id
+  dhcp_options_id            = oci_core_vcn.vcn.default_dhcp_options_id
+}
+
+resource "oci_core_internet_gateway" "igw01" {
+  compartment_id = var.compartment_ocid
+  display_name   = "igw01"
+  vcn_id         = oci_core_vcn.vcn.id
+}
+
+resource "oci_core_service_gateway" "sgw01" {
+  compartment_id = var.compartment_ocid
+  display_name   = "sgw01"
+  vcn_id         = oci_core_vcn.vcn.id
+  services {
+    service_id = lookup(data.oci_core_services.services.services[0], "id")
+  }
+}
+
+resource "oci_core_route_table" "public_subnets" {
+  compartment_id = var.compartment_ocid
+  vcn_id         = oci_core_vcn.vcn.id
+  display_name   = "public_subnets"
 
   route_rules {
-    network_entity_id = oci_core_internet_gateway.simple_internet_gateway[count.index].id
     destination       = "0.0.0.0/0"
     destination_type  = "CIDR_BLOCK"
+    network_entity_id = oci_core_internet_gateway.igw01.id
   }
-
-  freeform_tags = map(var.tag_key_name, var.tag_value)
 }
 
-resource "oci_core_route_table_attachment" "route_table_attachment" {
-  count          = local.use_existing_network ? 0 : 1
-  subnet_id      = oci_core_subnet.simple_subnet[count.index].id
-  route_table_id = oci_core_route_table.simple_route_table[count.index].id
+resource "oci_core_route_table" "private_subnets" {
+  compartment_id = var.compartment_ocid
+  vcn_id         = oci_core_vcn.vcn.id
+  display_name   = "private_subnets"
+  route_rules {
+    destination       = lookup(data.oci_core_services.services.services[0], "cidr_block")
+    destination_type  = "SERVICE_CIDR_BLOCK"
+    network_entity_id = oci_core_service_gateway.sgw01.id
+  }
+
 }
