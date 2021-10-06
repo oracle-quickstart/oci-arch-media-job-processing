@@ -1,3 +1,6 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 resource "oci_apigateway_gateway" "job_management" {
   compartment_id = var.compartment_ocid
   display_name   = "job_management"
@@ -5,7 +8,8 @@ resource "oci_apigateway_gateway" "job_management" {
   response_cache_details {
     type = "NONE"
   }
-  subnet_id = oci_core_subnet.public_subnet.id
+  subnet_id    = oci_core_subnet.public_subnet.id
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_apigateway_deployment" "job_management" {

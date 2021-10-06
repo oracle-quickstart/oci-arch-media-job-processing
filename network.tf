@@ -1,8 +1,12 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 resource "oci_core_vcn" "vcn" {
   cidr_block     = var.vcn_cidr
   dns_label      = "jobs"
   compartment_id = var.compartment_ocid
   display_name   = "vcn"
+  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_security_list" "public_security_list" {
@@ -23,6 +27,7 @@ resource "oci_core_security_list" "public_security_list" {
       max = 443
     }
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_security_list" "private_security_list" {
@@ -33,6 +38,7 @@ resource "oci_core_security_list" "private_security_list" {
     destination = "0.0.0.0/0"
     protocol    = "6"
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_subnet" "public_subnet" {
@@ -44,6 +50,7 @@ resource "oci_core_subnet" "public_subnet" {
   security_list_ids = [oci_core_security_list.public_security_list.id]
   route_table_id    = oci_core_route_table.public_subnets.id
   dhcp_options_id   = oci_core_vcn.vcn.default_dhcp_options_id
+  defined_tags      = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 
@@ -57,12 +64,14 @@ resource "oci_core_subnet" "private_subnet" {
   security_list_ids          = [oci_core_security_list.private_security_list.id]
   route_table_id             = oci_core_route_table.private_subnets.id
   dhcp_options_id            = oci_core_vcn.vcn.default_dhcp_options_id
+  defined_tags               = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_internet_gateway" "igw01" {
   compartment_id = var.compartment_ocid
   display_name   = "igw01"
   vcn_id         = oci_core_vcn.vcn.id
+  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_service_gateway" "sgw01" {
@@ -72,6 +81,7 @@ resource "oci_core_service_gateway" "sgw01" {
   services {
     service_id = lookup(data.oci_core_services.services.services[0], "id")
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_route_table" "public_subnets" {
@@ -84,6 +94,7 @@ resource "oci_core_route_table" "public_subnets" {
     destination_type  = "CIDR_BLOCK"
     network_entity_id = oci_core_internet_gateway.igw01.id
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_core_route_table" "private_subnets" {
@@ -95,5 +106,5 @@ resource "oci_core_route_table" "private_subnets" {
     destination_type  = "SERVICE_CIDR_BLOCK"
     network_entity_id = oci_core_service_gateway.sgw01.id
   }
-
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }

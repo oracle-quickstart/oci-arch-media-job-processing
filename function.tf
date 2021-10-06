@@ -1,8 +1,13 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 resource "oci_functions_application" "job_management" {
   compartment_id = var.compartment_ocid
   display_name   = "job_management"
   subnet_ids     = [oci_core_subnet.private_subnet.id]
   syslog_url     = ""
+  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+
 }
 
 resource "oci_functions_function" "create_job" {
@@ -18,6 +23,7 @@ resource "oci_functions_function" "create_job" {
     "FUNCTION_ENDPOINT" : oci_functions_function.launch_worker.invoke_endpoint
     "FUNCTION_OCID" : oci_functions_function.launch_worker.id
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_functions_function" "launch_worker" {
@@ -39,6 +45,7 @@ resource "oci_functions_function" "launch_worker" {
     "SHAPE" : "VM.Standard2.1"
     "PREEMPT_SHAPE" : "VM.Standard.E3.Flex"
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_functions_function" "check_preempted_worker" {
@@ -54,6 +61,7 @@ resource "oci_functions_function" "check_preempted_worker" {
     "FUNCTION_ENDPOINT" : oci_functions_function.launch_worker.invoke_endpoint
     "FUNCTION_OCID" : oci_functions_function.launch_worker.id
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_functions_function" "retry_queued" {
@@ -69,5 +77,6 @@ resource "oci_functions_function" "retry_queued" {
     "FUNCTION_ENDPOINT" : oci_functions_function.launch_worker.invoke_endpoint
     "FUNCTION_OCID" : oci_functions_function.launch_worker.id
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 

@@ -1,3 +1,11 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
+variable "release" {
+  description = "Reference Architecture Release (OCI Architecture Center)"
+  default     = "1.0"
+}
+
 variable "tenancy_ocid" {}
 variable "user_ocid" {}
 variable "fingerprint" {}
@@ -8,6 +16,29 @@ variable "compartment_ocid" {
   type        = string
   description = "The compartment that resources will be deployed in."
 }
+
+variable "compute_compartment_ocid" {}
+variable "network_compartment_ocid" {}
+
+variable "availablity_domain_name" {
+  default = ""
+}
+variable "availablity_domain_number" {
+  default = 0
+}
+
+variable "vm_compute_shape" {
+  default = "VM.Standard.E3.Flex"
+}
+
+variable "vm_compute_flex_shape_ocpus" {
+  default = 1
+}
+
+variable "vm_compute_flex_shape_mem" {
+  default = 10
+}
+
 variable "email_address" {
   type        = string
   default     = "nobody@oracle.com"
@@ -81,3 +112,4 @@ variable "retry_queued_function_version" {
   default = "1.0.0"
 
 }
+

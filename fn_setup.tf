@@ -1,3 +1,6 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 resource "oci_artifacts_container_repository" "create_job" {
   compartment_id = var.compartment_ocid
   display_name   = "create_job"

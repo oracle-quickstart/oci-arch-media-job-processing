@@ -1,5 +1,8 @@
+## Copyright © 2021, Oracle and/or its affiliates. 
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 resource "oci_identity_dynamic_group" "instances" {
-  provider       = oci.home
+  provider       = oci.homeregion
   name           = "WorkerInstancesDynamicGroup"
   description    = "All instances in the ${data.oci_identity_compartment.compartment.name} compartment."
   compartment_id = var.tenancy_ocid
@@ -7,7 +10,7 @@ resource "oci_identity_dynamic_group" "instances" {
 }
 
 resource "oci_identity_dynamic_group" "api_gateways" {
-  provider       = oci.home
+  provider       = oci.homeregion
   name           = "QueueApiGatewayDynamicGroup"
   description    = "All API Gateways in the ${data.oci_identity_compartment.compartment.name} compartment."
   compartment_id = var.tenancy_ocid
@@ -15,7 +18,7 @@ resource "oci_identity_dynamic_group" "api_gateways" {
 }
 
 resource "oci_identity_dynamic_group" "functions" {
-  provider       = oci.home
+  provider       = oci.homeregion
   name           = "JobFunctionsServiceDynamicGroup"
   description    = "All functions in the ${data.oci_identity_compartment.compartment.name} compartment."
   compartment_id = var.tenancy_ocid
@@ -24,7 +27,7 @@ resource "oci_identity_dynamic_group" "functions" {
 
 
 resource "oci_identity_policy" "job_managmement_policy" {
-  provider       = oci.home
+  provider       = oci.homeregion
   name           = "job_managmement_policy"
   description    = "job_managmement_policy"
   compartment_id = var.tenancy_ocid
