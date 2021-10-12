@@ -14,7 +14,11 @@ resource "oci_events_rule" "create_job" {
   display_name   = "create_job"
   is_enabled     = "true"
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
-
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_events_rule" "preemptible_event" {
@@ -30,7 +34,11 @@ resource "oci_events_rule" "preemptible_event" {
   display_name   = "preemptible_event"
   is_enabled     = "true"
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
-
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 

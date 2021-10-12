@@ -6,6 +6,11 @@ resource "oci_ons_notification_topic" "job_status" {
   description    = "job_status"
   name           = "job_status"
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_ons_subscription" "email_subscription" {
@@ -15,4 +20,9 @@ resource "oci_ons_subscription" "email_subscription" {
   protocol        = "EMAIL"
   topic_id        = oci_ons_notification_topic.job_status.id
   defined_tags    = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }

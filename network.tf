@@ -7,6 +7,11 @@ resource "oci_core_vcn" "vcn" {
   compartment_id = var.compartment_ocid
   display_name   = "vcn"
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_core_security_list" "public_security_list" {
@@ -28,6 +33,11 @@ resource "oci_core_security_list" "public_security_list" {
     }
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_core_security_list" "private_security_list" {
@@ -39,6 +49,11 @@ resource "oci_core_security_list" "private_security_list" {
     protocol    = "6"
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_core_subnet" "public_subnet" {
@@ -51,6 +66,11 @@ resource "oci_core_subnet" "public_subnet" {
   route_table_id    = oci_core_route_table.public_subnets.id
   dhcp_options_id   = oci_core_vcn.vcn.default_dhcp_options_id
   defined_tags      = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 
@@ -65,6 +85,11 @@ resource "oci_core_subnet" "private_subnet" {
   route_table_id             = oci_core_route_table.private_subnets.id
   dhcp_options_id            = oci_core_vcn.vcn.default_dhcp_options_id
   defined_tags               = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_core_internet_gateway" "igw01" {
@@ -72,6 +97,11 @@ resource "oci_core_internet_gateway" "igw01" {
   display_name   = "igw01"
   vcn_id         = oci_core_vcn.vcn.id
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_core_service_gateway" "sgw01" {
@@ -82,6 +112,11 @@ resource "oci_core_service_gateway" "sgw01" {
     service_id = lookup(data.oci_core_services.services.services[0], "id")
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_core_route_table" "public_subnets" {
@@ -95,6 +130,11 @@ resource "oci_core_route_table" "public_subnets" {
     network_entity_id = oci_core_internet_gateway.igw01.id
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_core_route_table" "private_subnets" {
@@ -107,4 +147,9 @@ resource "oci_core_route_table" "private_subnets" {
     network_entity_id = oci_core_service_gateway.sgw01.id
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }

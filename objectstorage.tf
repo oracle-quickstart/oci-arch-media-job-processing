@@ -10,6 +10,11 @@ resource "oci_objectstorage_bucket" "source_bucket" {
   storage_tier          = "Standard"
   versioning            = "Disabled"
   defined_tags          = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_objectstorage_bucket" "destination_bucket" {
@@ -21,4 +26,9 @@ resource "oci_objectstorage_bucket" "destination_bucket" {
   storage_tier          = "Standard"
   versioning            = "Disabled"
   defined_tags          = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }

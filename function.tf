@@ -7,6 +7,11 @@ resource "oci_functions_application" "job_management" {
   subnet_ids     = [oci_core_subnet.private_subnet.id]
   syslog_url     = ""
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_functions_function" "create_job" {
@@ -23,6 +28,11 @@ resource "oci_functions_function" "create_job" {
     "FUNCTION_OCID" : oci_functions_function.launch_worker.id
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 locals {
@@ -49,6 +59,11 @@ resource "oci_functions_function" "launch_worker" {
     "PREEMPT_SHAPE" : "VM.Standard.E3.Flex"
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_functions_function" "check_preempted_worker" {
@@ -65,6 +80,11 @@ resource "oci_functions_function" "check_preempted_worker" {
     "FUNCTION_OCID" : oci_functions_function.launch_worker.id
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_functions_function" "retry_queued" {
@@ -81,5 +101,10 @@ resource "oci_functions_function" "retry_queued" {
     "FUNCTION_OCID" : oci_functions_function.launch_worker.id
   }
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
