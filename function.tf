@@ -7,7 +7,6 @@ resource "oci_functions_application" "job_management" {
   subnet_ids     = [oci_core_subnet.private_subnet.id]
   syslog_url     = ""
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
-
 }
 
 resource "oci_functions_function" "create_job" {
@@ -26,6 +25,10 @@ resource "oci_functions_function" "create_job" {
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
+locals {
+  worker_image_id = length(data.oci_core_images.worker.images) == 0 ? "no_worker" : data.oci_core_images.worker.images[0].id
+}
+
 resource "oci_functions_function" "launch_worker" {
   depends_on     = [null_resource.launch_worker_fn_setup]
   application_id = oci_functions_application.job_management.id
@@ -36,7 +39,7 @@ resource "oci_functions_function" "launch_worker" {
     "ENDPOINT" : var.region
     "COMPARTMENT" : var.compartment_ocid
     "NOSQL_TABLE_NAME" : oci_nosql_table.job_tracking.name
-    "WORKER_IMAGE_ID" : data.oci_core_images.worker.images[0].id
+    "WORKER_IMAGE_ID" : local.worker_image_id
     "SUBNET" : oci_core_subnet.private_subnet.id
     "TOPIC_ID" : oci_ons_notification_topic.job_status.id
     "SOURCE_BUCKET_NAME" : oci_objectstorage_bucket.source_bucket.name

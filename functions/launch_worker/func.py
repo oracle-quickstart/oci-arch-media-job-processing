@@ -82,6 +82,15 @@ def nosql_get_object_name (event_id):
             handle.close()
 
 def launch_instance_every_object (event_id,object_name):
+    
+    if image_id == "no_worker":
+        failed_setup_message = "No worker image found. Please see README for worker image creation."
+        status = "Done"
+        instance_id = failed_setup_message
+        capacity = image_id
+        nosql_update_instance_id (event_id,object_name,status,instance_id,capacity)
+        logger.error(failed_setup_message)
+        return
 
     signer = oci.auth.signers.get_resource_principals_signer()
     compute_client = oci.core.ComputeClient(config={}, signer=signer)
