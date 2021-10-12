@@ -13,7 +13,7 @@ Additionally required when ***not*** deploying with OCI Resource Manager.
 - [Docker](https://www.docker.com/) - Installed locally.
 - [Terraform](https://www.terraform.io/) - Installed locally.
 
-# Demo Deployment
+# Deployment
 
 The compute workers in this demo utilize a custom compute image that must be available prior to using OCI Resource Manager or Terraform. The deployment process is done in two steps:
 
@@ -77,7 +77,7 @@ OCI Resources can be deployed using OCI Resource Manager or by running Terraform
       - *email_address* - worker status emails will be sent to this address.
 3. Run `terraform apply`.
 
-# Demo Usage
+# Usage
 
 To use this demo, upload a video file to the `source_bucket_name` bucket. A sucessful upload will trigger the media processing workflow below.
 ## Media Processing Workflow
@@ -86,7 +86,7 @@ To use this demo, upload a video file to the `source_bucket_name` bucket. A suce
 2. An `objectstorage.createobject` event is sent to the `create_job` function.
 3. The `create_job` function adds a record to the `job_tracking` NoSQL table and calls the `launch_worker` funciton for the job.
 4. When launched, the worker instance reads the source video and outptuts a new MP4 file with H.264 and AAC encoding to the destination object storage bucket.
-5. During the processing, the worker updates the `job_tracking` NoSQL table and triggers job status notification emails.
+5. During processing, the worker updates the `job_tracking` NoSQL table and sends job status notifications.
 6. When processing is compelete, the worker terminates itself.
 
 ## Job Management
@@ -95,7 +95,7 @@ Media processing jobs are managed using a Python functions and job state is stor
 
 One compute worker instance is launched per job. By default, [preemptible](https://docs.oracle.com/en-us/iaas/Content/Compute/Concepts/preemptible.htm) capacity is used when launching wokers. If preemptible capacity is not available, a worker is lanched using [on-demand](https://docs.oracle.com/en-us/iaas/Content/Compute/Concepts/capacity-types.htm) capacity. 
 
-# Demo Cleanup
+# Cleanup
 
 Any media objects created as part of operating this demo will prevent Terraform from fully cleaning up resources.
 
