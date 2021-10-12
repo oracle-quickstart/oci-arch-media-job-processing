@@ -9,8 +9,6 @@ region = "us-ashburn-1"
 
 # Compartment
 compartment_ocid = ""
-compute_compartment_ocid = ""
-network_compartment_ocid = ""
 
 # OCI Image Repository Credentials
 ocir_user_name   = ""
