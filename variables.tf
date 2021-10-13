@@ -17,28 +17,6 @@ variable "compartment_ocid" {
   description = "The compartment that resources will be deployed in."
 }
 
-variable "compute_compartment_ocid" {}
-variable "network_compartment_ocid" {}
-
-variable "availablity_domain_name" {
-  default = ""
-}
-variable "availablity_domain_number" {
-  default = 0
-}
-
-variable "vm_compute_shape" {
-  default = "VM.Standard.E3.Flex"
-}
-
-variable "vm_compute_flex_shape_ocpus" {
-  default = 1
-}
-
-variable "vm_compute_flex_shape_mem" {
-  default = 10
-}
-
 variable "email_address" {
   type        = string
   default     = "nobody@oracle.com"

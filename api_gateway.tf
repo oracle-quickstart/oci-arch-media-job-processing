@@ -10,6 +10,11 @@ resource "oci_apigateway_gateway" "job_management" {
   }
   subnet_id    = oci_core_subnet.public_subnet.id
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_apigateway_deployment" "job_management" {
@@ -42,6 +47,12 @@ resource "oci_apigateway_deployment" "job_management" {
       path = "/retry_queued"
     }
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 resource "oci_health_checks_http_monitor" "retry_queued" {
   compartment_id = var.compartment_ocid
@@ -60,4 +71,10 @@ resource "oci_health_checks_http_monitor" "retry_queued" {
   vantage_point_names = [
     "aws-iad",
   ]
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }

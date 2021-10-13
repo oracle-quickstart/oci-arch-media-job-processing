@@ -5,7 +5,11 @@ resource "oci_logging_log_group" "job_management" {
   compartment_id = var.compartment_ocid
   description    = "job_management"
   display_name   = "job_management"
-  freeform_tags = {
+  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
   }
 }
 
@@ -24,6 +28,12 @@ resource "oci_logging_log" "job_management_invoke" {
   log_group_id       = oci_logging_log_group.job_management.id
   log_type           = "SERVICE"
   retention_duration = "30"
+  defined_tags       = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_logging_log" "api_gateway_execution" {
@@ -41,6 +51,12 @@ resource "oci_logging_log" "api_gateway_execution" {
   log_group_id       = oci_logging_log_group.job_management.id
   log_type           = "SERVICE"
   retention_duration = "30"
+  defined_tags       = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_logging_log" "create_job_event" {
@@ -58,6 +74,12 @@ resource "oci_logging_log" "create_job_event" {
   log_group_id       = oci_logging_log_group.job_management.id
   log_type           = "SERVICE"
   retention_duration = "30"
+  defined_tags       = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
 
 resource "oci_logging_log" "check_preempted_worker_event" {
@@ -75,4 +97,10 @@ resource "oci_logging_log" "check_preempted_worker_event" {
   log_group_id       = oci_logging_log_group.job_management.id
   log_type           = "SERVICE"
   retention_duration = "30"
+  defined_tags       = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+  lifecycle {
+    ignore_changes = [
+      defined_tags
+    ]
+  }
 }
