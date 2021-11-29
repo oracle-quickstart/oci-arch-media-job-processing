@@ -1,10 +1,10 @@
 ## Copyright © 2021, Oracle and/or its affiliates. 
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
-resource "oci_logging_log_group" "job_management" {
+resource "oci_logging_log_group" "job_logs" {
   compartment_id = var.compartment_ocid
-  description    = "job_management"
-  display_name   = "job_management"
+  description    = "job_logs"
+  display_name   = "job_logs"
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
   lifecycle {
     ignore_changes = [
@@ -18,14 +18,14 @@ resource "oci_logging_log" "job_management_invoke" {
     compartment_id = var.compartment_ocid
     source {
       category    = "invoke"
-      resource    = oci_functions_application.job_management.id
+      resource    = oci_functions_application.job_logs.id
       service     = "functions"
       source_type = "OCISERVICE"
     }
   }
   display_name       = "job_management_invoke"
   is_enabled         = "true"
-  log_group_id       = oci_logging_log_group.job_management.id
+  log_group_id       = oci_logging_log_group.job_logs.id
   log_type           = "SERVICE"
   retention_duration = "30"
   defined_tags       = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
@@ -41,14 +41,14 @@ resource "oci_logging_log" "api_gateway_execution" {
     compartment_id = var.compartment_ocid
     source {
       category    = "execution"
-      resource    = oci_apigateway_deployment.job_management.id
+      resource    = oci_apigateway_deployment.job_logs.id
       service     = "apigateway"
       source_type = "OCISERVICE"
     }
   }
   display_name       = "api_gateway_execution"
   is_enabled         = "true"
-  log_group_id       = oci_logging_log_group.job_management.id
+  log_group_id       = oci_logging_log_group.job_logs.id
   log_type           = "SERVICE"
   retention_duration = "30"
   defined_tags       = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
@@ -71,7 +71,7 @@ resource "oci_logging_log" "create_job_event" {
   }
   display_name       = "create_job_event"
   is_enabled         = "true"
-  log_group_id       = oci_logging_log_group.job_management.id
+  log_group_id       = oci_logging_log_group.job_logs.id
   log_type           = "SERVICE"
   retention_duration = "30"
   defined_tags       = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
@@ -94,7 +94,7 @@ resource "oci_logging_log" "check_preempted_worker_event" {
   }
   display_name       = "check_preempted_worker_event"
   is_enabled         = "true"
-  log_group_id       = oci_logging_log_group.job_management.id
+  log_group_id       = oci_logging_log_group.job_logs.id
   log_type           = "SERVICE"
   retention_duration = "30"
   defined_tags       = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
