@@ -18,7 +18,7 @@ resource "oci_logging_log" "job_management_invoke" {
     compartment_id = var.compartment_ocid
     source {
       category    = "invoke"
-      resource    = oci_functions_application.job_logs.id
+      resource    = oci_functions_application.job_management.id
       service     = "functions"
       source_type = "OCISERVICE"
     }
@@ -41,7 +41,7 @@ resource "oci_logging_log" "api_gateway_execution" {
     compartment_id = var.compartment_ocid
     source {
       category    = "execution"
-      resource    = oci_apigateway_deployment.job_logs.id
+      resource    = oci_apigateway_deployment.job_management.id
       service     = "apigateway"
       source_type = "OCISERVICE"
     }
