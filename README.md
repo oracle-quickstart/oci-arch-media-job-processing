@@ -1,103 +1,88 @@
-# Overview
+# oci-arch-media-job-processing
 
-This Terraform deploys Oracle Cloud Infrastructure resources to implement the [Media processing using serverless job management and ephemeral compute workers](https://docs.oracle.com/en/solutions/media-processing-using-serverless-job-management-and-ephemeral-compute-workers) Reference Architecture.
+Processing large media files can be a resource intensive operation requiring large compute shapes for timely and efficient processing. In scenarios where media processing requests might be ad-hoc and on-demand, leaving instances idle while waiting for new work is not cost effective.
 
-# Prerequisites
+By utilizing Oracle Cloud Infrastructure's (OCI) server-less capabilities, including OCI Functions and OCI NoSQL, we can quickly create a management system for processing media content using ephemeral OCI Compute workers.
+
+
+For details of the architecture, see [Process media by using serverless job management and ephemeral compute workers](https://docs.oracle.com/en/solutions/process-media-using-oci-services/index.html)
+
+## Prerequisites
 
 - [Packer](https://www.packer.io/) - Installed locally.
 - [OCI API Key](https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm) - Used for executing Packer and Terraform.
-- [OCI Auth Token](https://docs.oracle.com/en-us/iaas/Content/Registry/Tasks/registrygettingauthtoken.htm) - Used for pushing images to an OCI containter registry using Terraform.
+- [OCI Auth Token](https://docs.oracle.com/en-us/iaas/Content/Registry/Tasks/registrygettingauthtoken.htm) - Used for pushing images to an OCI container registry using Terraform.
 
 Additionally required when ***not*** deploying with OCI Resource Manager.
 
-- [Docker](https://www.docker.com/) - Installed locally.
+- [Docker CLI](https://www.docker.com/) - Installed locally.
 - [Terraform](https://www.terraform.io/) - Installed locally.
 
-# Deployment
+## Deploy Using Oracle Resource Manager
 
-The compute workers in this demo utilize a custom compute image that must be available prior to using OCI Resource Manager or Terraform. The deployment process is done in two steps:
+1. Click [![Deploy to Oracle Cloud](https://oci-resourcemanager-plugin.plugins.oci.oraclecloud.com/latest/deploy-to-oracle-cloud.svg)](https://console.us-ashburn-1.oraclecloud.com/resourcemanager/stacks/create?region=home&zipUrl=https://github.com/oracle-quickstart/oci-arch-media-job-processing/releases/latest/download/oci-arch-media-job-processing-stack-latest.zip)
 
-1. [Build Custom Worker Image](#build-custom-worker-image-with-packer)
-2. [Deploy Resources](#deploy-resources)
+    If you aren't already signed in, when prompted, enter the tenancy and user credentials.
 
-## Build Custom Worker Image with Packer
+2. Review and accept the terms and conditions.
 
-[HashiCorp Packer](https://www.packer.io/) uses similar configuration values as the OCI CLI and Terraform. 
-### Packer Setup
+3. Select the region where you want to deploy the stack.
 
-1. Create a deployment compartment in the target OCI tenancy. This compartment is used for both Packer and Terraform resources.
-2. Create a temporary Packer VCN for the build process. The [Create a VCN with Internet Connectivity](https://console.us-sanjose-1.oraclecloud.com/networking/solutions/vcn) wizard from the Networking landing page in the OCI console can be used. 
-3. Use `Packer/worker.pkrvars.hcl.example` as a template to create `Packer/worker.pkrvars.hcl`.
-4. Configure the OCI Tenancy variables in `Packer/worker.pkrvars.hcl`. **Note:** *private_key_path* in Terraform is *key_file* in Packer.
-      - *tenancy_ocid*
-      - *user_ocid*
-      - *fingerprint*
-      - *key_file*
-      - *region*
-      - *compartment_ocid* - The OCID of the Compartment created in step #1.
-5. Configure Network variables in `Packer/worker.pkrvars.hcl`.
-      - *availability_domain*
-      - *subnet_ocid* - The OCID of the Public Subnet created in step #2.
-6. Configure the Oracle Linux 8 variable in `Packer/worker.pkrvars.hcl`. 
-      - *ol_base_image_ocid* - Find the Image OCID for the most recent [Oracle Linux 8](https://docs.oracle.com/en-us/iaas/images/oraclelinux-8x/) version for the OCI Region that Packer will use.
+4. Follow the on-screen prompts and instructions to create the stack.
 
-### Packer Build
+5. After creating the stack, click **Terraform Actions**, and select **Plan**.
 
-1.  Open a terminal session and navigate to the `Packer` directory.
-2.  Run `sh build` or `packer build -var-file=worker.pkrvars.hcl worker.pkr.hcl`. **Note:** This build takes about 24 minutes to complete.
-3. An image OCID is shown after a sucessful build. You do not need to save this OCID, Terraform will discover it automatically.
-4. Terminate the temporary Packer VCN.
+6. Wait for the job to be completed, and review the plan.
 
-## Deploy Resources
+    To make any changes, return to the Stack Details page, click **Edit Stack**, and make the required changes. Then, run the **Plan** action again.
 
-OCI Resources can be deployed using OCI Resource Manager or by running Terraform locally.
+7. If no further changes are necessary, return to the Stack Details page, click **Terraform Actions**, and select **Apply**. 
 
-### Resource Manager Deplyment
+## Deploy Using the Terraform CLI
 
-1. Download [Stack.zip](Stack.zip).
-2. Create an OCI Resource Manager Stack using Stack.zip in the compartment previously created in the [Build Custom Worker Image with Packer](#build-custom-worker-image-with-packer) section.
-3. Configure variables for the Stack.
-      - *email_address* - worker status emails will be sent to this address.
-      - *ocir_user_name* - User name that will push docker images to the container registry. Be sure to use the full username, including `oracleidentitycloudservice/` if using an IDCS user.
-      - *ocir_password* - Auth Token for the user that will push docker images to the container registry.
-4. Deploy the Stack.
+### Clone the Repository
+Now, you'll want a local copy of this repo. You can make that with the commands:
 
-### Terraform Deployment
+    git clone https://github.com/oracle-quickstart/oci-arch-media-job-processing.git
+    cd oci-arch-media-job-processing
+    ls
 
-1. Start Docker.
-2. Use `terraform.tfvars.example` as a template to create `terraform.tfvars`. Some of the variable from `Packer/worker.pkrvars.hcl` can be reused.
-      - *tenancy_ocid* 
-      - *user_ocid*
-      - *fingerprint*
-      - *private_key_path* - key_file from `Packer/worker.pkrvars.hcl`.
-      - *region*
-      - *compartment_ocid* - The compartment previously created in the [Build Custom Worker Image with Packer](#build-custom-worker-image-with-packer) section.
-      - *ocir_user_name* - User name that will push docker images to the container registry. Be sure to use the full username, including `oracleidentitycloudservice/` if using an IDCS user.
-      - *ocir_password* - Auth Token for the user that will push docker images to the container registry.
-      - *email_address* - worker status emails will be sent to this address.
-3. Run `terraform apply`.
+2. Create a `terraform.tfvars` file, and specify the following variables:
 
-# Usage
+```
+# Authentication
+tenancy_ocid         = "<tenancy_ocid>"
+user_ocid            = "<user_ocid>"
+fingerprint          = "<finger_print>"
+private_key_path     = "<pem_private_key_path>"
 
-To use this demo, upload a video file to the `source_bucket_name` bucket. A sucessful upload will trigger the media processing workflow below.
-## Media Processing Workflow
+# Region
+region = "<oci_region>"
 
-1. A video is uploaded to the source object storage bucket.
-2. An `objectstorage.createobject` event is sent to the `create_job` function.
-3. The `create_job` function adds a record to the `job_tracking` NoSQL table and calls the `launch_worker` funciton for the job.
-4. When launched, the worker instance reads the source video and outptuts a new MP4 file with H.264 and AAC encoding to the destination object storage bucket.
-5. During processing, the worker updates the `job_tracking` NoSQL table and sends job status notifications.
-6. When processing is compelete, the worker terminates itself.
+# Compartment
+compartment_ocid = "<compartment_ocid>"
 
-## Job Management
-Media processing jobs are managed using a Python functions and job state is stored in an OCI NoSQL table. If a worker cannot be launched to process a job due to reaching a limit or quota, an hourly health check will attempt the launch later. All job management functions send logs to OCI Logging.
-## Worker Deployment
+# OCI Image Repository Credentials
+ocir_user_name   = "User name that will push docker images to the container registry."
+ocir_password    = "Auth Token for the user that will push docker images to the container registry."
 
-One compute worker instance is launched per job. By default, [preemptible](https://docs.oracle.com/en-us/iaas/Content/Compute/Concepts/preemptible.htm) capacity is used when launching wokers. If preemptible capacity is not available, a worker is lanched using [on-demand](https://docs.oracle.com/en-us/iaas/Content/Compute/Concepts/capacity-types.htm) capacity. 
+# Job Notifications
+email_address    = "Job status emails will be sent to this address."
+```
 
-# Cleanup
+### Create the Resources
+Run the following commands:
 
-Any media objects created as part of operating this demo will prevent Terraform from fully cleaning up resources.
+    terraform init
+    terraform plan
+    terraform apply
+
+### Destroy the Deployment
+When you no longer need the deployment, you can run this command to destroy the resources:
+
+    terraform destroy
+
+**Note:** Any media objects created as part of operating this demo will prevent Terraform from fully cleaning up resources.
 
 1. Delete any objects and uncommitted multipart uploads in the `source_bucket_name` bucket.
 2. Delete any objects and uncommitted multipart uploads in the `destination_bucket_name` bucket.
@@ -105,3 +90,26 @@ Any media objects created as part of operating this demo will prevent Terraform 
 The `oci_functions_application` and `oci_ons_notification_topic` resources take some time to be terminated. The `terraform destroy` process for this configuration normally take more than 15 minutes to run.
 
 After the Terraform configuration has been destroyed, delete the custom woker image and delete the compartment that was created for the deployment.
+
+## Create Worker Image
+
+Prior to the deployment being functional, an OCI Compute Custom Image needs to be created for the worker instances using Packer. For Packer usage and custom image creation, see [packer/README.md](packer/README.md).
+
+After the custom image is created, the `WORKER_IMAGE_ID` configuration variable value of the `launch_worker` function need to be updated with the image OCID. The value can set mauanlly or by re-running the Oracle Resounce Manager or Terraform CLI apply commands.
+## Usage
+
+To use this demo, upload a video file to the `source_bucket_name` bucket. A successful upload will trigger the media processing workflow below.
+### Media Processing Workflow
+
+1. A video is uploaded to the source object storage bucket.
+2. An `objectstorage.createobject` event is sent to the `create_job` function.
+3. The `create_job` function adds a record to the `job_tracking` NoSQL table and calls the `launch_worker` function for the job.
+4. When launched, the worker instance reads the source video and outptuts a new MP4 file with H.264 and AAC encoding to the destination object storage bucket.
+5. During processing, the worker updates the `job_tracking` NoSQL table and sends job status notifications.
+6. When processing is complete, the worker terminates itself.
+
+### Job Management
+Media processing jobs are managed using a Python functions and job state is stored in an OCI NoSQL table. If a worker cannot be launched to process a job due to reaching a limit or quota, a regular health check will attempt the launch later. All job management functions send logs to OCI Logging.
+### Worker Deployment
+
+One compute worker instance is launched per job. By default, [preemptible](https://docs.oracle.com/en-us/iaas/Content/Compute/Concepts/preemptible.htm) capacity is used when launching workers. If preemptible capacity is not available, a worker is lanched using [on-demand](https://docs.oracle.com/en-us/iaas/Content/Compute/Concepts/capacity-types.htm) capacity. 
