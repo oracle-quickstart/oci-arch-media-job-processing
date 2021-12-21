@@ -26,22 +26,27 @@ variable "email_address" {
     error_message = "Required."
   }
 }
+
 variable "source_bucket_name" {
   type    = string
   default = "transcode_source"
 }
+
 variable "destination_bucket_name" {
   type    = string
   default = "transcode_destination"
 }
+
 variable "vcn_cidr" {
   type    = string
   default = "10.0.0.0/16"
 }
+
 variable "public_subnet_cidr" {
   type    = string
   default = "10.0.1.0/24"
 }
+
 variable "private_subnet_cidr" {
   type    = string
   default = "10.0.0.0/24"
@@ -50,6 +55,7 @@ variable "ocir_repo_name" {
   type    = string
   default = "job_management"
 }
+
 variable "ocir_user_name" {
   type        = string
   description = "User name that will push docker images to the container registry."
